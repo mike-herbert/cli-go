@@ -18,7 +18,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/spf13/cobra"
 )
@@ -51,6 +50,5 @@ func getURL(url string) {
 		fmt.Println("You must pass in a url if you are enabling the flag --url (-u)")
 		os.Exit(1)
 	}
-	newURL := path.Clean(url)
-	println(newURL)
+	println(url)
 }
