@@ -17,6 +17,9 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -32,10 +35,7 @@ var getCmd = &cobra.Command{
 		if verbose {
 			fmt.Println("Running get command")
 		}
-		url, err := cmd.Flags().GetString("url")
-		if err != nil {
-			// handle error
-		}
+		url, _ := cmd.Flags().GetString("url")
 		getURL(url)
 	},
 }
@@ -45,10 +45,28 @@ func init() {
 	getCmd.Flags().StringP("url", "u", "", "URL to be requested")
 }
 
-func getURL(url string) {
-	if len(url) == 0 {
+func getURL(destination string) {
+	if len(destination) == 0 {
 		fmt.Println("You must pass in a url if you are enabling the flag --url (-u)")
 		os.Exit(1)
 	}
-	println(url)
+
+	u, err := url.ParseRequestURI(destination)
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+	response, err := http.Get(u.String())
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+
+	fmt.Println(string(responseData))
 }
